@@ -31,7 +31,7 @@ defmodule FamilyTreeCliTest do
 
       cmd(~s(connect "Naruto Uzumaki" as son of "Minato Namikaze"))
       cmd(~s(connect "Naruto Uzumaki" as son of "Kushina Uzumaki"))
-      assert capture_io(fn -> cmd(~s(--detail parents of "Naruto Uzumaki")) end) == ~s(parents of "Naruto Uzumaki": "Kushina Uzumaki" [gender: "female"]\n"Minato Namikaze" [gender: "male", occupation: "4th Hokage"]\n)
+      assert capture_io(fn -> cmd(~s(--detail parents of "Naruto Uzumaki")) end) == ~s(parents of "Naruto Uzumaki":\n-----------------------\n"Kushina Uzumaki" [gender: "female"]\n"Minato Namikaze" [gender: "male", occupation: "4th Hokage"]\n)
       clear_db(nil)
     end
 
