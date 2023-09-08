@@ -18,16 +18,16 @@ FamilyTree - A command line system which can help a user define their family tre
 
 Here's a sample usage to get started:
 ```sh
-# Some relationship rules first
-./family_tree set relationship parent father --gender=male
-./family_tree set relationship parent mother --gender=female
-./family_tree set relationship child son --gender=male
-./family_tree set relationship child daughter --gender=female
+# Some relationship rules are defined first
+./family_tree set relationship parent father gender:male
+./family_tree set relationship parent mother gender:female
+./family_tree set relationship child son gender:male
+./family_tree set relationship child daughter gender:female
 
 # Let's add some people
-./family_tree add person "Naruto Uzumaki" --gender=male
-./family_tree add person "Kushina Uzumaki" --gender=female
-./family_tree add person "Minato Namikaze" --gender=male
+./family_tree add person "Naruto Uzumaki" gender:male
+./family_tree add person "Kushina Uzumaki" gender:female
+./family_tree add person "Minato Namikaze" "gender:male;occupation:4th Hokage"
 
 # Let's relate people now (Relationship exists between 2 persons for now)
 ./family_tree connect "Naruto Uzumaki" as child of "Kushina Uzumaki"

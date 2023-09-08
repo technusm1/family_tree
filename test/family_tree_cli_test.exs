@@ -18,17 +18,34 @@ defmodule FamilyTreeCliTest do
       clear_db(nil)
     end
 
+    test "with details option" do
+      cmd(~s(add person "Naruto Uzumaki" "gender:male"))
+      cmd(~s(add person "Minato Namikaze" "gender:male;occupation:4th Hokage"))
+      cmd(~s(add person "Kushina Uzumaki" "gender:female"))
+      cmd(~s(add relationship parent child))
+
+      assert capture_io(fn -> cmd(~s(set relationship parent father "gender:male")) end) == ~s(parent will be called father when parent [gender: "male"]\n)
+      assert capture_io(fn -> cmd(~s(set relationship parent mother "gender:female")) end) == ~s(parent will be called mother when parent [gender: "female"]\n)
+      assert capture_io(fn -> cmd(~s(set relationship child son "gender:male")) end) == ~s(child will be called son when child [gender: "male"]\n)
+      assert capture_io(fn -> cmd(~s(set relationship child daughter "gender:female")) end) == ~s(child will be called daughter when child [gender: "female"]\n)
+
+      cmd(~s(connect "Naruto Uzumaki" as son of "Minato Namikaze"))
+      cmd(~s(connect "Naruto Uzumaki" as son of "Kushina Uzumaki"))
+      assert capture_io(fn -> cmd(~s(--detail parents of "Naruto Uzumaki")) end) == ~s(parents of "Naruto Uzumaki": "Kushina Uzumaki" [gender: "female"]\n"Minato Namikaze" [gender: "male", occupation: "4th Hokage"]\n)
+      clear_db(nil)
+    end
+
     test "with extra options" do
-      cmd(~s(add person "Naruto Uzumaki" --gender=male --age=25))
-      cmd(~s(add person "Kushina Uzumaki" --gender=female))
-      cmd(~s(add person "Minato Namikaze" --gender=male))
+      cmd(~s(add person "Naruto Uzumaki" "gender:male;age:25"))
+      cmd(~s(add person "Kushina Uzumaki" gender:female))
+      cmd(~s(add person "Minato Namikaze" gender:male))
 
       cmd(~s(add relationship parent child))
 
-      assert capture_io(fn -> cmd(~s(set relationship parent father --gender=male)) end) == ~s(parent will be called father when parent [gender: "male"]\n)
-      assert capture_io(fn -> cmd(~s(set relationship parent mother --gender=female)) end) == ~s(parent will be called mother when parent [gender: "female"]\n)
-      assert capture_io(fn -> cmd(~s(set relationship child son --gender=male)) end) == ~s(child will be called son when child [gender: "male"]\n)
-      assert capture_io(fn -> cmd(~s(set relationship child daughter --gender=female)) end) == ~s(child will be called daughter when child [gender: "female"]\n)
+      assert capture_io(fn -> cmd(~s(set relationship parent father gender:male)) end) == ~s(parent will be called father when parent [gender: "male"]\n)
+      assert capture_io(fn -> cmd(~s(set relationship parent mother "gender:female")) end) == ~s(parent will be called mother when parent [gender: "female"]\n)
+      assert capture_io(fn -> cmd(~s(set relationship child son gender:male)) end) == ~s(child will be called son when child [gender: "male"]\n)
+      assert capture_io(fn -> cmd(~s(set relationship child daughter gender:female)) end) == ~s(child will be called daughter when child [gender: "female"]\n)
 
       cmd(~s(connect "Naruto Uzumaki" as child of "Kushina Uzumaki"))
       cmd(~s(connect "Naruto Uzumaki" as child of "Minato Namikaze"))
@@ -42,12 +59,12 @@ defmodule FamilyTreeCliTest do
 
     test "for self-complementary relation" do
       cmd(~s(add person "Boruto Uzumaki"))
-      cmd(~s(add person "Himawari Uzumaki" --gender=female))
+      cmd(~s(add person "Himawari Uzumaki" gender:female))
 
       cmd(~s(add relationship sibling))
 
-      assert capture_io(fn -> cmd(~s(set relationship sibling brother --gender=male)) end) == ~s(sibling will be called brother when sibling [gender: "male"]\n)
-      assert capture_io(fn -> cmd(~s(set relationship sibling sister --gender=female)) end) == ~s(sibling will be called sister when sibling [gender: "female"]\n)
+      assert capture_io(fn -> cmd(~s(set relationship sibling brother gender:male)) end) == ~s(sibling will be called brother when sibling [gender: "male"]\n)
+      assert capture_io(fn -> cmd(~s(set relationship sibling sister gender:female)) end) == ~s(sibling will be called sister when sibling [gender: "female"]\n)
 
       cmd(~s(connect "Boruto Uzumaki" as brother of "Himawari Uzumaki"))
 
@@ -61,48 +78,48 @@ defmodule FamilyTreeCliTest do
 
     test "a family tree by billy shakespeare" do
       # First generation
-      cmd(~s(add person "John Shakespeare" --died 1602))
-      cmd(~s(add person "Mary Arden" --died 1602 --gender=female))
+      cmd(~s(add person "John Shakespeare" died:1602))
+      cmd(~s(add person "Mary Arden" died:1602;gender:female))
 
       # Second generation
-      cmd(~s(add person "Joan" --born 1558 --died 1559 --gender=female))
-      cmd(~s(add person "Margaret" --born 1562 --died 1563 --gender=female))
+      cmd(~s(add person "Joan" born:1558;died:1559;gender:female))
+      cmd(~s(add person "Margaret" born:1562;died:1563;gender:female))
 
-      cmd(~s(add person "William Shakespeare" --born 1564 --died 1616))
-      cmd(~s(add person "Anne Hathaway" --born 1556 --died 1623 --gender=female))
+      cmd(~s(add person "William Shakespeare" born:1564;died:1616))
+      cmd(~s(add person "Anne Hathaway" born:1556;died:1623;gender:female))
 
-      cmd(~s(add person "Gilbert" --born 1566 --died 1612))
-      cmd(~s(add person "Anne" --born 1571 --died 1579 --gender=female))
-      cmd(~s(add person "Richard" --born 1574 --died 1613))
-      cmd(~s(add person "Edmund" --born 1580 --died 1607))
+      cmd(~s(add person "Gilbert" born:1566;died:1612))
+      cmd(~s(add person "Anne" born:1571;died:1579;gender:female))
+      cmd(~s(add person "Richard" born:1574;died:1613))
+      cmd(~s(add person "Edmund" born:1580;died:1607))
 
       # Shakespeare's brats
-      cmd(~s(add person "Susanna" --born 1583 --died 1649 --gender=female))
-      cmd(~s(add person "Hamnet" --born 1585 --died 1596))
-      cmd(~s(add person "Judith" --born 1585 --died 1662 --gender=female))
+      cmd(~s(add person "Susanna" born:1583;died:1649;gender:female))
+      cmd(~s(add person "Hamnet" born:1585;died:1596))
+      cmd(~s(add person "Judith" born:1585;died:1662;gender:female))
 
       # Shakespeare's sons-in-law
-      cmd(~s(add person "Thomas Quiney" --born 1589 --died 1655))
-      cmd(~s(add person "John Hall" --born 1575 --died 1635))
+      cmd(~s(add person "Thomas Quiney" born:1589;died:1655))
+      cmd(~s(add person "John Hall" born:1575;died:1635))
 
       # Shakespeare's grandkids
-      cmd(~s(add person "Elizabeth" --born 1608 --died 1670 --gender=female))
-      cmd(~s(add person "Shakespeare" --born 1616 --died 1617 --gender=male))
-      cmd(~s(add person "Richard II" --born 1618 --died 1639 --gender=male)) # <-- We're naming this one Richard II, since we already have a Richard in the family tree
-      cmd(~s(add person "Thomas" --born 1620 --died 1639 --gender=male))
+      cmd(~s(add person "Elizabeth" born:1608;died:1670;gender:female))
+      cmd(~s(add person "Shakespeare" born:1616;died:1617;gender:male))
+      cmd(~s(add person "Richard II" born:1618;died:1639;gender:male)) # <-- We're naming this one Richard II, since we already have a Richard in the family tree
+      cmd(~s(add person "Thomas" born:1620;died:1639;gender:male))
 
       cmd(~s(add relationship spouse))
       cmd(~s(add relationship sibling))
       cmd(~s(add relationship parent child))
 
-      assert capture_io(fn -> cmd(~s(set relationship parent father --gender=male)) end) == ~s(parent will be called father when parent [gender: "male"]\n)
-      assert capture_io(fn -> cmd(~s(set relationship parent mother --gender=female)) end) == ~s(parent will be called mother when parent [gender: "female"]\n)
-      assert capture_io(fn -> cmd(~s(set relationship child son --gender=male)) end) == ~s(child will be called son when child [gender: "male"]\n)
-      assert capture_io(fn -> cmd(~s(set relationship child daughter --gender=female)) end) == ~s(child will be called daughter when child [gender: "female"]\n)
-      assert capture_io(fn -> cmd(~s(set relationship spouse husband --gender=male)) end) == ~s(spouse will be called husband when spouse [gender: "male"]\n)
-      assert capture_io(fn -> cmd(~s(set relationship spouse wife --gender=female)) end) == ~s(spouse will be called wife when spouse [gender: "female"]\n)
-      assert capture_io(fn -> cmd(~s(set relationship sibling brother --gender=male)) end) == ~s(sibling will be called brother when sibling [gender: "male"]\n)
-      assert capture_io(fn -> cmd(~s(set relationship sibling sister --gender=female)) end) == ~s(sibling will be called sister when sibling [gender: "female"]\n)
+      assert capture_io(fn -> cmd(~s(set relationship parent father gender:male)) end) == ~s(parent will be called father when parent [gender: "male"]\n)
+      assert capture_io(fn -> cmd(~s(set relationship parent mother gender:female)) end) == ~s(parent will be called mother when parent [gender: "female"]\n)
+      assert capture_io(fn -> cmd(~s(set relationship child son gender:male)) end) == ~s(child will be called son when child [gender: "male"]\n)
+      assert capture_io(fn -> cmd(~s(set relationship child daughter gender:female)) end) == ~s(child will be called daughter when child [gender: "female"]\n)
+      assert capture_io(fn -> cmd(~s(set relationship spouse husband gender:male)) end) == ~s(spouse will be called husband when spouse [gender: "male"]\n)
+      assert capture_io(fn -> cmd(~s(set relationship spouse wife gender:female)) end) == ~s(spouse will be called wife when spouse [gender: "female"]\n)
+      assert capture_io(fn -> cmd(~s(set relationship sibling brother gender:male)) end) == ~s(sibling will be called brother when sibling [gender: "male"]\n)
+      assert capture_io(fn -> cmd(~s(set relationship sibling sister gender:female)) end) == ~s(sibling will be called sister when sibling [gender: "female"]\n)
 
       # Connecting first generation and second
       cmd(~s(connect "John Shakespeare" as husband of "Mary Arden"))
@@ -169,6 +186,7 @@ defmodule FamilyTreeCliTest do
       end
 
       assert capture_io(fn -> cmd(~s(brothers of "Shakespeare")) end) == ~s(brothers of "Shakespeare": "Richard II", "Thomas"\n)
+      clear_db(nil)
     end
   end
 
