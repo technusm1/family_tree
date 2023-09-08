@@ -1,4 +1,28 @@
 defmodule FamilyTree.Cli do
+  def main(["add", "person", name | other_attrs]) do
+    {other_attrs_list, _, _} = OptionParser.parse(other_attrs, switches: [age: :integer])
+    result = FamilyTree.add_person(name, other_attrs_list)
+    case result do
+      {:error, reason} -> IO.puts(:stderr, "FAILED TO add person: #{reason}")
+      :ok -> nil
+    end
+  end
+
+  def main(["add", "relationship", relationship1, relationship2]) do
+    result = FamilyTree.add_relationship(relationship1, relationship2)
+    case result do
+      {:error, reason} -> IO.puts(:stderr, "FAILED TO add relationship: #{reason}")
+      :ok -> nil
+    end
+  end
+
+  def main(["add", "relationship", relationship1]) do
+    result = FamilyTree.add_relationship(relationship1, relationship1)
+    case result do
+      {:error, reason} -> IO.puts(:stderr, "FAILED TO add relationship: #{reason}")
+      :ok -> nil
+    end
+  end
 
   def main(["-h"]) do
     IO.puts("USAGE:\tfamily_tree <COMMAND> <opts>")
