@@ -58,7 +58,9 @@ defmodule FamilyTree.Cli do
     result = FamilyTree.find_relation_of(name, singular_relation)
              |> Stream.map(fn name -> FamilyTree.get_person(name) end)
              |> Enum.map(fn person -> "#{person.name} [#{person.other_attrs |> Enum.map(fn {k, v} -> "#{Atom.to_string(k)}: \"#{v}\"" end) |> Enum.join(", ")}]\n" end)
-    IO.write("#{relation} of #{name}: #{result}")
+    IO.write("#{relation} of #{name}:\n")
+    IO.write("-----------------------\n")
+    IO.write("#{result}")
   end
 
   def main([relation, "of", name]) do
