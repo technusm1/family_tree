@@ -229,4 +229,8 @@ defmodule FamilyTree do
       _ -> []
     end
   end
+
+  def find_relation_count_of(name, relation) do
+    find_relation_of(name, relation) |> Enum.count()
+  end
 end
