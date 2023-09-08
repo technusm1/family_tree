@@ -24,6 +24,14 @@ defmodule FamilyTree.Cli do
     end
   end
 
+  def main(["set", "relationship", relationship, relationship_alias | conditions_list]) do
+    {conditions_list, _, _} = OptionParser.parse(conditions_list, switches: [gender: :string])
+    case FamilyTree.set_relationship(relationship, relationship_alias, conditions_list) do
+      :ok -> IO.puts("#{relationship} will be called #{relationship_alias} when #{relationship} #{inspect(conditions_list)}")
+      {:error, reason} -> IO.puts(:stderr, "FAILED TO set relationship: #{reason}")
+    end
+  end
+
   def main(["connect", name1, "as", relationship, "of", name2]) do
     result = FamilyTree.connect(name1, name2, relationship)
     case result do
