@@ -19,6 +19,7 @@ FamilyTree - A command line system which can help a user define their family tre
 Here's a sample usage to get started:
 ```sh
 # Some relationship rules are defined first
+./family_tree add relationship parent child
 ./family_tree set relationship parent father gender:male
 ./family_tree set relationship parent mother gender:female
 ./family_tree set relationship child son gender:male
@@ -39,7 +40,9 @@ Based on above, you can ask questions like the following:
 ./family_tree mother of "Naruto Uzumaki"
 ./family_tree count sons of "Kushina Uzumaki"
 ./family_tree count children of "Kushina Uzumaki"
-./family_tree count daughter of "Minato Namikaze"
+./family_tree count daughters of "Minato Namikaze"
+./family_tree parents of "Naruto Uzumaki"
+./family_tree --detail parents of "Naruto Uzumaki" # Prints the detailed information about the relatives in question, i.e. parents
 ```
 
 ## Limitations
