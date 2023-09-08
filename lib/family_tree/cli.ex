@@ -24,6 +24,27 @@ defmodule FamilyTree.Cli do
     end
   end
 
+  def main(["connect", name1, "as", relationship, "of", name2]) do
+    result = FamilyTree.connect(name1, name2, relationship)
+    case result do
+      {:error, reason} -> IO.puts(:stderr, "FAILED TO CONNECT: #{reason}")
+      :ok -> nil
+      _ -> IO.puts("CONNECT returned result: #{result}")
+    end
+  end
+
+  def main(["count", relation, "of", name]) do
+    singular_relation = FamilyTree.Utils.Singular.to_singular(relation)
+    result = FamilyTree.find_relation_count_of(name, singular_relation)
+    IO.puts("No. of #{relation} of #{name}: #{result}")
+  end
+
+  def main([relation, "of", name]) do
+    singular_relation = FamilyTree.Utils.Singular.to_singular(relation)
+    result = FamilyTree.find_relation_of(name, singular_relation)
+    IO.puts("#{relation} of #{name}: #{result |> Enum.join(", ")}")
+  end
+
   def main(["-h"]) do
     IO.puts("USAGE:\tfamily_tree <COMMAND> <opts>")
     opts_list = [
